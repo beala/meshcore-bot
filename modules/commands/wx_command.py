@@ -139,20 +139,6 @@ class WxCommand(BaseCommand):
             return self.delegate_command.get_help_text()
         return self.translate('commands.wx.description')
     
-    def matches_keyword(self, message: MeshMessage) -> bool:
-        """Check if message starts with a weather keyword"""
-        if self.delegate_command:
-            return self.delegate_command.matches_keyword(message)
-        
-        content = message.content.strip()
-        if content.startswith('!'):
-            content = content[1:].strip()
-        content_lower = content.lower()
-        for keyword in self.keywords:
-            if content_lower.startswith(keyword + ' ') or content_lower == keyword:
-                return True
-        return False
-    
     def can_execute(self, message: MeshMessage) -> bool:
         """Override to delegate or use base class cooldown"""
         # Check if wx command is enabled
