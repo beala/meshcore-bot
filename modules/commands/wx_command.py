@@ -858,7 +858,23 @@ class WxCommand(BaseCommand):
             # Format the forecast - focus on current conditions and key info
             if not forecast:
                 return "No forecast data available", weather_json
-            
+
+            # If the first period is a night period and it's currently after midnight
+            # but before noon locally, skip to the next daytime period so early-morning
+            # queries show the upcoming day's forecast instead of "Tonight/Overnight"
+            if not forecast[0].get('isDaytime', True):
+                start_time_str = forecast[0].get('startTime', '')
+                try:
+                    dt = datetime.fromisoformat(start_time_str)
+                    local_now = datetime.now(dt.tzinfo)
+                    if 0 <= local_now.hour < 12:
+                        for skip_i, p in enumerate(forecast[1:], start=1):
+                            if p.get('isDaytime', True):
+                                forecast = forecast[skip_i:]
+                                break
+                except Exception:
+                    pass
+
             current = forecast[0]
             day_name = self._noaa_period_display_name(current)
             temp = current.get('temperature', 'N/A')
