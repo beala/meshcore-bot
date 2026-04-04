@@ -416,8 +416,8 @@ class WxCommand(BaseCommand):
         if self.delegate_command:
             return await self.delegate_command.execute(message)
         
-        content = message.content.strip()
-        
+        content = self._strip_mentions(message.content.strip())
+
         # Parse the command to extract location and forecast type
         # Support formats: "wx 12345", "wx seattle", "wx paris, tx", "weather everett", "wxa bellingham"
         # New formats: "wx 12345 tomorrow", "wx 12345 7", "wx 12345 7day", "wx 12345 alerts"
